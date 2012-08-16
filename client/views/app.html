@@ -8,9 +8,11 @@
   <body>
   	<form>
   		<div id="radioButtons">
-  		<p>Happy</p>
+  		
+      <p>Happy</p>
   		<input type="radio" name="Emotion" value="Happy">
-  		<p>Frustration</p>
+  		
+      <p>Frustration</p>
   		<input type="radio" name="Emotion" value="Frustration">
 
   		<p>Stress</p>
@@ -18,8 +20,25 @@
 
   		<p>Relaxed</p>
   		<input type="radio" name="Emotion" value="Meditative">
-  	</div>
+  	
+    </div>
   	</form>
+
+    
+      <fieldset>
+        <select name="selectableApps" id="selectList" MULTIPLE SIZE=4>
+          <option value="IE">Internet Explorer
+          <option value="Firefox">Firefox
+          <option value="Chrome">Chrome
+          <option value="Safari">Safari
+        </select>
+      </fieldset>
+    
+    <form>
+        <input class="btn btn-primary" type="button"
+        value="Back" id="appToggle">
+    </form>
     <h1>Welcome to your new realtime app!</h1>
+    
   </body>
 </html>

@@ -18,6 +18,27 @@ var svg;
 var isFirst = false;
 var isGraph = false;
 var color = d3.scale.category20();
+var jsonNodes = new Object();
+
+var chart;
+var chartArr = new Array();
+
+var IEObj = new Object();
+ IEObj.values = new Array();
+ IEObj.key = "Internet Explorer";
+
+var FirefoxObj = new Object();
+ FirefoxObj.values = new Array();
+ FirefoxObj.key = "Firefox";
+
+var ChromeObj = new Object();
+ ChromeObj.values = new Array();
+ ChromeObj.key = "Chrome";
+
+var SafariObj = new Object();
+ SafariObj.values = new Array();
+ SafariObj.key = "Safari";
+
 
 function screenLoad(){
 	//Make fullscreen svg to draw on
@@ -26,72 +47,132 @@ function screenLoad(){
 	heightScreen = window.innerHeight;
 	svg = d3.select("body").append("svg:svg").attr("width", widthScreen).attr("height",heightScreen)
 	.attr("pointer-events", "all");
+}
 
+function initChart(){
+	var inputValues = new Array("IE", "Firefox", "Safari", "Chrome");
+
+	var inputVal = $('input[name=Emotion]:checked').val();
+	console.log(inputValues);
+	ss.rpc('serverMain.changeToGraph', inputVal, inputValues);
 }
 
 //Used for svg quick reload
 function svgReload(){
 	d3.select("svg").remove();
 	svg = d3.select("body").append("svg:svg").attr("width", widthScreen).attr("height",heightScreen);
+	console.log("Erased the svg!");
 }
 
-function changeToJSONGraph(json){
+function updateJSONGraphWithNewValues(name){
+	//svgReload();
+	console.log("Updating the JSON graph...");
+	//chartArr = new Array();
+	//They should really make enums for Javascript...
+	name = String(name);
+
+	chartArr.splice(1,1);
+
+	console.log("Splice result: " + chartArr);
+
+	if (name === "IE"){
+		chartArr[1] = IEObj;
+		console.log("Called IE");
+	} 
+	else if (name === "Safari"){
+		chartArr[1] = SafariObj;
+		console.log("Called Safari");
+	} 
+	else if (name === "Chrome"){
+		chartArr[1] = ChromeObj;
+		console.log("Called CHrome");
+
+	} 
+	else if (name === "Firefox"){
+		chartArr[1] = FirefoxObj;
+		console.log("Called Firefox");
+	}
+	else{
+		console.log("Was none of the above..." + typeof name);
+	}
+	console.log("Going with: " + chartArr[1].key);
+}
+
+function changeToJSONGraph(appNameArr){
 	svgReload();
-	alert(json.data.length);
 
-	var prevAppName;
-
-	var dataForGraph = new Array();
-
-	var tempGraphObj = new Object();
-	tempGraphObj.values = new Array();
-	tempGraphObj.key = new String();
-
-	for (var i = 0; i < json.data.length; i++) {
-		
-		var indexForGraph = 0;
-
-		var isSame;
-
-		if (i === 0){
-			prevAppName = json.data[0].appName;
-		}
-		else{
-			prevAppName = json.data[i - 1].appName;
-		}
-
-		if (prevAppName === json.data[i].appName){
-			isSame = true;
-		}
-		else{
-			isSame = false;
-		}
-		var tempGraphObjArray = new Array();
-		tempGraphObjArray[0] = new Date(json.data[json.data.length - 1 - i].date);
-		//alert(tempGraphObjArray[0]);
-		tempGraphObjArray[1] = json.data[json.data.length - 1 - i].emotion;
-		//alert(tempGraphObjArray[1]);
-
-		if (isSame === true){
-			tempGraphObj.values[tempGraphObj.values.length] = tempGraphObjArray;
-			if (i === json.data.length - 1){
-				tempGraphObj.key = json.data[i].appName;
-				dataForGraph[indexForGraph] = tempGraphObj;
-				indexForGraph++;
-			}
-		}
-		else{				
-			tempGraphObj.key = json.data[i].appName;
-			dataForGraph[indexForGraph] = tempGraphObj;
-			// alert("Entered a new object: " + tempGraphObj + " for graph");
-		}
-		
-	};
+	chartArr = new Array();
+	//They should really make enums for Javascript...
+	
+	if (appNameArr[0] === "IE"){
+		chartArr[0] = IEObj;
+		console.log("Was IE");
+	}
+	if (appNameArr[0] === "Safari"){
+		chartArr[0] = SafariObj;
+	}
+	if (appNameArr[0] === "Chrome"){
+		chartArr[0] = ChromeObj;
+	}
+	if (appNameArr[0] === "Firefox"){
+		chartArr[0] = FirefoxObj;
+	}
 
 	nv.addGraph(function(){
-		var chart = nv.models.lineWithFocusChart()
-		.x(function(d){ 
-			
+		svg
+		.datum(chartArr)
+		.transition().duration(500)
+		.call(chart);
+
+		nv.utils.windowResize(chart.update);
+
+		return chart;
+	});
+
+	document.getElementById("selectList").style.visibility = "visible";
+}
+
+function initGraph(json){
+	console.log("Initiating graph");
+	console.log("Json.data.length: " + json.data.length);
+	var IEIndex = 0;
+	var FirefoxIndex = 0;
+	var ChromeIndex = 0;
+	var SafariIndex = 0;
+
+	for (var i = 0; i < json.data.length; i++) {
+		var tempGraphObjArray = new Array();
+		//console.log("Values going in: " + json.data[i].date);
+		tempGraphObjArray[0] = new Date(json.data[i].date);
+		tempGraphObjArray[1] = json.data[i].emotion;
+		//console.log(tempGraphObjArray[0] + tempGraphObjArray[1]);
+		//console.log(json.data[json.data.length - 1].appName);
+		//They should really make enums for Javascript...
+		if (json.data[i].appName === "IE"){
+			IEObj.values[IEIndex] = tempGraphObjArray;
+			IEIndex++;
+			// console.log("tempGraphObjArray : " + tempGraphObjArray[0] + tempGraphObjArray[1]);
+			// console.log("Triggered IE: " + IEObj.values[i - 1]);
+		}
+		if (json.data[i].appName === "Safari"){
+			SafariObj.values[SafariIndex] = tempGraphObjArray;
+			SafariIndex++;
+		}
+		if (json.data[i].appName === "Chrome"){
+			ChromeObj.values[ChromeIndex] = tempGraphObjArray;
+			ChromeIndex++;
+		}
+		if (json.data[i].appName === "Firefox"){
+			FirefoxObj.values[FirefoxIndex] = tempGraphObjArray;
+			FirefoxIndex++;
+		}	
+	};
+	console.log("IEObj val is: " + IEObj.values[0]);
+}
+
+function setPrefsChart(){
+		chart = nv.models.lineWithFocusChart()
+		.x(function(d){
 			return d[0]; 
 		})
 		.y(function(d){ 
@@ -101,54 +182,19 @@ function changeToJSONGraph(json){
 
 		chart.xAxis.tickFormat(
 			function(d){
-				//Strange cast...
-				var lastDate = dataForGraph[0].values[dataForGraph[0].values.length - 1];
-				lastDate = lastDate[0];
-				var firstDate = dataForGraph[0].values[0];
-				firstDate = firstDate[0];
-				var differenceInDays = lastDate.getTime() - firstDate.getTime();
-				differenceInDays /= 1000*60*60*24;
-
-				//alert("differenceInDays is: " + differenceInDays);
-				if (differenceInDays < 1){
-					//alert("less than one day");
-					return d3.time.format('%X')(new Date(d));
-				}
-				else{
-					return d3.time.format('%x')(new Date(d));
-				}
+				return d3.time.format('%x')(new Date(d));
 			});
 
 		chart.yAxis.tickFormat(d3.format(',1f'));
 
 		chart.x2Axis.tickFormat(
 			function(d){
-				var lastDate = dataForGraph[0].values[dataForGraph[0].values.length - 1];
-				lastDate = lastDate[0];
-				var firstDate = dataForGraph[0].values[0];
-				firstDate = firstDate[0];
-				var differenceInDays = lastDate.getTime() - firstDate.getTime();
-				differenceInDays /= 1000*60*60*24;
-				if (differenceInDays < 1){
-					return d3.time.format('%X')(new Date(d));
-				}
-				else{
-					return d3.time.format('%x')(new Date(d));
-				}
+				return d3.time.format('%x')(new Date(d));
 			}
 		);
 
 		chart.y2Axis.tickFormat(d3.format(',1f'));
 
-		svg
-		.datum(dataForGraph)
-		.transition().duration(500)
-		.call(chart);
-
-		nv.utils.windowResize(chart.update);
-
-		return chart;
-	});
 }
 
 function updateJSONGraph(json){
@@ -156,6 +202,8 @@ function updateJSONGraph(json){
 }
 
 function initJSON(json){
+	svgReload();
+	jsonNodes = json.data;
 	forceLayoutAttr = d3.layout.force()
 		.nodes(json.data)
 		.size([widthScreen, heightScreen])
@@ -169,8 +217,10 @@ function initJSON(json){
 		.attr("name", function(d){return d.appName;})
 		.attr("index", function(d, i){return i;})
 		.on("click", function(d){
-			alert("Clicked!");
-        	exports.changeToGraph(d.appName);
+			console.log("Clicked!");
+			var x = new Array(d.appName);
+			console.log(x);
+        	changeToJSONGraph(x);
         })
 		.call(forceLayoutAttr.drag);
 
@@ -207,20 +257,24 @@ function initJSON(json){
 d3.timer(forceLayoutAttr.resume);
 
 function handleJSONOnceReturned(json){
+	svgReload();
 	forceLayoutAttr = d3.layout.force()
-		.nodes(json.data)
+		.nodes(json)
 		.size([widthScreen, heightScreen])
-		.links([]);
+		.links([])
+		.start();
 
 	var node = svg.selectAll("g.node")
-		.data(json.data)
+		.data(json)
 		.enter().append("g")
 		.attr("class", "node")
 		.attr("name", function(d){return d.appName;})
 		.attr("index", function(d, i){return i;})
 		.on("click", function(d){
-			alert("Clicked!");
-        	exports.changeToGraph(d.appName);
+			console.log("Clicked!");
+			var x = new Array(d.appName);
+			console.log(x);
+        	changeToJSONGraph(x);
         })
 		.call(forceLayoutAttr.drag);
 
@@ -250,14 +304,13 @@ function handleJSONOnceReturned(json){
 	);
 	forceLayoutAttr.on("tick", function(){
     node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });	});
-
 }
 
 // Listen out for newData events coming from the server
 ss.event.on('newData', function(message) {
 	//Put d3 stuff here
 	//Get json
-	//alert(message);
+	//console.log(message);
 	if (isFirst === false){
 		initJSON(message);
 		isFirst = true;
@@ -269,10 +322,14 @@ ss.event.on('newData', function(message) {
 });
 
 exports.changeToGraph = function(appName){
-	alert(appName);
+	console.log(appName);
 	var inputVal = $('input[name=Emotion]:checked').val();
 	return ss.rpc('serverMain.changeToGraph', inputVal, appName);
 }
+
+ss.event.on('initGraph', function(message){
+	initGraph(message);
+});
 
 ss.event.on('changeToGraph', function(message){
 	isGraph = true;
@@ -290,8 +347,29 @@ exports.send = function() {
 //Loads after doc ready
 $(document).ready(function() {
 	screenLoad();
+
+	$('#selectList').change(function(){
+        var x = $('#selectList').val();
+        console.log(x);
+        updateJSONGraphWithNewValues(x);
+        console.log("Called");
+      });
+
+	$('#appToggle').click(function(){
+		console.log(jsonNodes);
+		document.getElementById("selectList").style.visibility = "hidden";
+		handleJSONOnceReturned(jsonNodes);
+	});
+
 });
 
-exports.send();
+initChart();
 
-setInterval(function(){exports.send()}, 30000);
+function s(){
+
+	exports.send();
+
+	setPrefsChart();
+}
+
+s();

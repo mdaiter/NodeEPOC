@@ -8,8 +8,8 @@ var http = require('http'),
 // Define a single-page client called 'main'
 ss.client.define('main', {
   view: 'app.html',
-  css:  ['app.styl', 'libs/nv.d3.css'],
-  code: ['libs/jquery.min.js', 'libs/d3.v2.min.js', 'libs/nvd3/nv.d3.min.js', 'app'],
+  css:  ['app.styl', 'libs/nv.d3.css', 'libs/bootstrap.min.css'],
+  code: ['libs/jquery.min.js', 'libs/d3.v2.min.js', 'libs/nvd3/nv.d3.min.js', 'libs/spin.min.js', 'app'],
   tmpl: '*'
 });
 
