@@ -1,13 +1,17 @@
 {
-  "name": "EPOC",
-  "description": "An awesome real time application",
+  "name": "NodeEPOC",
+  "description": "An awesome real time application that grabs data and displays it well!",
   "version": "0.0.1",
-  "author": "Me <me@mydomain.com>",
-  "private": true,
+  "author": "Me <mdaiter@exeter.edu>",
+  "private": false,
   "engines": { "node": ">= 0.6.0" },
   "dependencies": {
     "socketstream": "0.3.x",
     "ss-stylus": "0.1.x",
-    "ss-hogan": "0.1.x"
+    "ss-hogan": "0.1.x",
+    "request" : "2.10.x",
+    "jquery":"1.7.3",
+    "jsdom":"0.2.1x",
+    "xmlhttprequest":"1.4.x"
   }
 }
