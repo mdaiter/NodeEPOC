@@ -7,24 +7,17 @@
   </head>
   <body>
   	<form>
-  		<div id="radioButtons">
-  		
-      <p>Happy</p>
-  		<input type="radio" name="Emotion" value="Happy">
-  		
-      <p>Frustration</p>
-  		<input type="radio" name="Emotion" value="Frustration">
-
-  		<p>Stress</p>
-  		<input type="radio" name="Emotion" value="Stress">
-
-  		<p>Relaxed</p>
-  		<input type="radio" name="Emotion" value="Meditative">
-  	
-    </div>
+      <fieldset>
+        <select name="radioButtonList" id="radioButtons" MULTIPLE SIZE=4>
+          <option value="Happy">Happy
+          <option value="Frustration">Frustration
+          <option value="Stress">Stress
+          <option value="Meditative">Relaxed
+        </select>
+      </fieldset>
   	</form>
 
-    
+     <p id="headerSelectList">Compare:</p>
       <fieldset>
         <select name="selectableApps" id="selectList" MULTIPLE SIZE=4>
           <option value="IE">Internet Explorer
@@ -38,7 +31,7 @@
         <input class="btn btn-primary" type="button"
         value="Back" id="appToggle">
     </form>
-    <h1>Welcome to your new realtime app!</h1>
+    <h1>EmoTrac!</h1>
     
   </body>
 </html>

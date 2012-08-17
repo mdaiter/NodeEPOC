@@ -45,10 +45,10 @@ function initCurrEmotions(){
 function handleJSON(isGraph, res, ss){
   var retrJSON;
   if (isGraph == false){
-	 retrJSON = {"person":{"appUUID":"f7039011-2e43-4a8f-92a7-899b6e340190", "clientUUID":"fd29489a-1c95-4698-ba1d-695be931e6d4"}, "UserAll":"true", "Emotions":emotionSearchFor, "email":"mdaiter@exeter.edu"};
+	 retrJSON = {"person":{"appUUID":"fa4766f6-42df-4633-b3fe-fa145c752573", "clientUUID":"dc1f1248-b042-47e2-8291-fd1ab05f3f16"}, "UserAll":"true", "Emotions":emotionSearchFor, "email":"mdaiter@exeter.edu"};
   }
   else{
-   retrJSON = {"person":{"appUUID":"f7039011-2e43-4a8f-92a7-899b6e340190", "clientUUID":"fd29489a-1c95-4698-ba1d-695be931e6d4"}, "UserAll":"true", "AppName":appNameSearchedFor, "Emotions":emotionSearchFor, "email":"mdaiter@exeter.edu"};
+   retrJSON = {"person":{"appUUID":"fa4766f6-42df-4633-b3fe-fa145c752573", "clientUUID":"dc1f1248-b042-47e2-8291-fd1ab05f3f16"}, "UserAll":"true", "AppName":appNameSearchedFor, "Emotions":emotionSearchFor, "email":"mdaiter@exeter.edu"};
   }
   //Ajax is a little faster than sync
   var options = {
@@ -199,7 +199,7 @@ function processJSON(json, res, ss){
         console.log("Data array is: " + dataArray);
 
 
-        for (var i = dataArray.length - 1; i >= dataArray.length - 5; i--) {
+        for (var i = dataArray.length - 1; i >= dataArray.length - 11; i--) {
           var latestDateObject = dataArray[i];
 
         console.log("Object in data array is: " + latestDateObject); 

@@ -35,9 +35,35 @@ var ChromeObj = new Object();
  ChromeObj.values = new Array();
  ChromeObj.key = "Chrome";
 
-var SafariObj = new Object();
- SafariObj.values = new Array();
- SafariObj.key = "Safari";
+var uTorrentObj = new Object();
+ uTorrentObj.values = new Array();
+ uTorrentObj.key = "uTorrent";
+
+var transmissionObj = new Object();
+ transmissionObj.values = new Array();
+ transmissionObj.key = "transmission";
+
+var eclipseObj = new Object();
+ eclipseObj.values = new Array();
+ eclipseObj.key = "Eclipse";
+
+var iTunesObj = new Object();
+ iTunesObj.values = new Array();
+ iTunesObj.key = "iTunes";
+
+var battlefieldObj = new Object();
+ battlefieldObj.values = new Array();
+ battlefieldObj.key = "Battlefield";
+
+var WOWObj = new Object();
+ WOWObj.values = new Array();
+ WOWObj.key = "World of Warcraft";
+
+var SpotifyObj = new Object();
+ SpotifyObj.values = new Array();
+ SpotifyObj.key = "Spotify";
+
+var appArr = new Array(IEObj, FirefoxObj, ChromeObj, uTorrentObj, transmissionObj, eclipseObj, iTunesObj, battlefieldObj, WOWObj, SpotifyObj);
 
 
 function screenLoad(){
@@ -52,9 +78,9 @@ function screenLoad(){
 function initChart(){
 	var inputValues = new Array("IE", "Firefox", "Safari", "Chrome");
 
-	var inputVal = $('input[name=Emotion]:checked').val();
+	var inputVal = $('#radioButtons').val();
 	console.log(inputValues);
-	ss.rpc('serverMain.changeToGraph', inputVal, inputValues);
+	ss.rpc('serverMain.changeToGraph', String(inputVal), inputValues);
 }
 
 //Used for svg quick reload
@@ -75,26 +101,13 @@ function updateJSONGraphWithNewValues(name){
 
 	console.log("Splice result: " + chartArr);
 
-	if (name === "IE"){
-		chartArr[1] = IEObj;
-		console.log("Called IE");
-	} 
-	else if (name === "Safari"){
-		chartArr[1] = SafariObj;
-		console.log("Called Safari");
-	} 
-	else if (name === "Chrome"){
-		chartArr[1] = ChromeObj;
-		console.log("Called CHrome");
+	for (var i = appArr.length - 1; i >= 0; i--) {
+		if (appArr[i].key === name){
+			chartArr[1] = appArr[i];
+			console.log("Called " + appArr.key);
+		}
+	};
 
-	} 
-	else if (name === "Firefox"){
-		chartArr[1] = FirefoxObj;
-		console.log("Called Firefox");
-	}
-	else{
-		console.log("Was none of the above..." + typeof name);
-	}
 	console.log("Going with: " + chartArr[1].key);
 }
 
@@ -104,19 +117,12 @@ function changeToJSONGraph(appNameArr){
 	chartArr = new Array();
 	//They should really make enums for Javascript...
 	
-	if (appNameArr[0] === "IE"){
-		chartArr[0] = IEObj;
-		console.log("Was IE");
-	}
-	if (appNameArr[0] === "Safari"){
-		chartArr[0] = SafariObj;
-	}
-	if (appNameArr[0] === "Chrome"){
-		chartArr[0] = ChromeObj;
-	}
-	if (appNameArr[0] === "Firefox"){
-		chartArr[0] = FirefoxObj;
-	}
+	for (var i = appArr.length - 1; i >= 0; i--) {
+		if (appArr[i].key === appNameArr[0]){
+			chartArr[0] = appArr[i];
+			console.log("Was " + appArr[i].key);
+		}
+	};
 
 	nv.addGraph(function(){
 		svg
@@ -130,6 +136,7 @@ function changeToJSONGraph(appNameArr){
 	});
 
 	document.getElementById("selectList").style.visibility = "visible";
+	document.getElementById("headerSelectList").style.visibility = "visible";
 }
 
 function initGraph(json){
@@ -148,24 +155,12 @@ function initGraph(json){
 		//console.log(tempGraphObjArray[0] + tempGraphObjArray[1]);
 		//console.log(json.data[json.data.length - 1].appName);
 		//They should really make enums for Javascript...
-		if (json.data[i].appName === "IE"){
-			IEObj.values[IEIndex] = tempGraphObjArray;
-			IEIndex++;
-			// console.log("tempGraphObjArray : " + tempGraphObjArray[0] + tempGraphObjArray[1]);
-			// console.log("Triggered IE: " + IEObj.values[i - 1]);
-		}
-		if (json.data[i].appName === "Safari"){
-			SafariObj.values[SafariIndex] = tempGraphObjArray;
-			SafariIndex++;
-		}
-		if (json.data[i].appName === "Chrome"){
-			ChromeObj.values[ChromeIndex] = tempGraphObjArray;
-			ChromeIndex++;
-		}
-		if (json.data[i].appName === "Firefox"){
-			FirefoxObj.values[FirefoxIndex] = tempGraphObjArray;
-			FirefoxIndex++;
-		}	
+
+		for (var j = appArr.length - 1; j >= 0; j--) {
+			if (appArr[j].key === json.data[i].appName){
+				appArr[j].values[appArr[j].values.length] = tempGraphObjArray;
+			}
+		};
 	};
 	console.log("IEObj val is: " + IEObj.values[0]);
 }
@@ -323,8 +318,8 @@ ss.event.on('newData', function(message) {
 
 exports.changeToGraph = function(appName){
 	console.log(appName);
-	var inputVal = $('input[name=Emotion]:checked').val();
-	return ss.rpc('serverMain.changeToGraph', inputVal, appName);
+	var inputVal = $('#radioButtons').val();
+	return ss.rpc('serverMain.changeToGraph', String(inputVal), appName);
 }
 
 ss.event.on('initGraph', function(message){
@@ -339,14 +334,22 @@ ss.event.on('changeToGraph', function(message){
 // Demonstrates sharing code between modules by exporting function
 exports.send = function() {
 	if (!isGraph){
-		var inputVal = $('input[name=Emotion]:checked').val();
- 	   return ss.rpc('serverMain.updateData', inputVal);
+		var inputVal = $('#radioButtons').val();
+		console.log(inputVal);
+		console.log(typeof inputVal);
+ 	   return ss.rpc('serverMain.updateData', String(inputVal));
 	}
 };
 
 //Loads after doc ready
 $(document).ready(function() {
 	screenLoad();
+
+	$('radioButtons').change(function(){
+		console.log("Changed val of radio button!");
+		exports.send();	
+		initChart();
+	});
 
 	$('#selectList').change(function(){
         var x = $('#selectList').val();
@@ -358,6 +361,7 @@ $(document).ready(function() {
 	$('#appToggle').click(function(){
 		console.log(jsonNodes);
 		document.getElementById("selectList").style.visibility = "hidden";
+		document.getElementById("headerSelectList").style.visibility = "hidden";
 		handleJSONOnceReturned(jsonNodes);
 	});
 
