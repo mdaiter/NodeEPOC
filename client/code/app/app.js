@@ -9,8 +9,8 @@ console.log('App Loaded');
 //Necessary for the force layout to manipulate crap
 var forceLayoutAttr = d3.layout.force()
 .distance(300)
-		.charge(-1000)
-		.gravity(0.025);
+		.gravity(-0.01)
+		.friction(0.9);
 var graphLayoutAttr;
 var widthScreen;
 var heightScreen;
@@ -25,7 +25,7 @@ var chartArr = new Array();
 
 var IEObj = new Object();
  IEObj.values = new Array();
- IEObj.key = "Internet Explorer";
+ IEObj.key = "IE";
 
 var FirefoxObj = new Object();
  FirefoxObj.values = new Array();
@@ -37,46 +37,48 @@ var ChromeObj = new Object();
 
 var uTorrentObj = new Object();
  uTorrentObj.values = new Array();
- uTorrentObj.key = "uTorrent";
+ uTorrentObj.key = "UTorrent";
 
 var transmissionObj = new Object();
  transmissionObj.values = new Array();
- transmissionObj.key = "transmission";
+ transmissionObj.key = "Transmission";
 
 var eclipseObj = new Object();
  eclipseObj.values = new Array();
  eclipseObj.key = "Eclipse";
 
-var iTunesObj = new Object();
- iTunesObj.values = new Array();
- iTunesObj.key = "iTunes";
+// var iTunesObj = new Object();
+//  iTunesObj.values = new Array();
+//  iTunesObj.key = "iTunes";
 
-var battlefieldObj = new Object();
- battlefieldObj.values = new Array();
- battlefieldObj.key = "Battlefield";
+// var battlefieldObj = new Object();
+//  battlefieldObj.values = new Array();
+//  battlefieldObj.key = "Battlefield";
 
-var WOWObj = new Object();
- WOWObj.values = new Array();
- WOWObj.key = "World of Warcraft";
+// var WOWObj = new Object();
+//  WOWObj.values = new Array();
+//  WOWObj.key = "World of Warcraft";
 
-var SpotifyObj = new Object();
- SpotifyObj.values = new Array();
- SpotifyObj.key = "Spotify";
+// var SpotifyObj = new Object();
+//  SpotifyObj.values = new Array();
+//  SpotifyObj.key = "Spotify";
 
-var appArr = new Array(IEObj, FirefoxObj, ChromeObj, uTorrentObj, transmissionObj, eclipseObj, iTunesObj, battlefieldObj, WOWObj, SpotifyObj);
+var appArr = new Array(IEObj, FirefoxObj, ChromeObj, uTorrentObj, transmissionObj, eclipseObj);
 
 
 function screenLoad(){
 	//Make fullscreen svg to draw on
 
 	widthScreen = window.innerWidth;
-	heightScreen = window.innerHeight;
+	heightScreen = window.innerHeight * .5;
 	svg = d3.select("body").append("svg:svg").attr("width", widthScreen).attr("height",heightScreen)
 	.attr("pointer-events", "all");
+	chart.width(widthScreen)
+	.height(heightScreen * 1.5);
 }
 
 function initChart(){
-	var inputValues = new Array("IE", "Firefox", "Safari", "Chrome");
+	var inputValues = new Array("IE", "Firefox", "Chrome", "UTorrent", "Transmission", "Eclipse");
 
 	var inputVal = $('#radioButtons').val();
 	console.log(inputValues);
@@ -142,10 +144,6 @@ function changeToJSONGraph(appNameArr){
 function initGraph(json){
 	console.log("Initiating graph");
 	console.log("Json.data.length: " + json.data.length);
-	var IEIndex = 0;
-	var FirefoxIndex = 0;
-	var ChromeIndex = 0;
-	var SafariIndex = 0;
 
 	for (var i = 0; i < json.data.length; i++) {
 		var tempGraphObjArray = new Array();
@@ -203,7 +201,6 @@ function initJSON(json){
 		.nodes(json.data)
 		.size([widthScreen, heightScreen])
 		.links([])
-		.start();
 
 	var node = svg.selectAll("g.node")
 		.data(json.data)
@@ -243,10 +240,19 @@ function initJSON(json){
 			return d.appName;
 		}
 	);
+
+	console.log(appArr);
+
 	forceLayoutAttr.on("tick", function(){
     node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });	});
 
-	
+	forceLayoutAttr.charge(function(d){
+			var x = -Math.pow(d.emotion, 2.0)/8;
+		console.log(x);
+			return x;
+		});
+	forceLayoutAttr
+		.start();
 }
 
 d3.timer(forceLayoutAttr.resume);
@@ -299,6 +305,14 @@ function handleJSONOnceReturned(json){
 	);
 	forceLayoutAttr.on("tick", function(){
     node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });	});
+
+		forceLayoutAttr.charge(function(d){
+			var x = -Math.pow(d.emotion, 2.0)/8;
+		console.log(x);
+			return x;
+		});
+	forceLayoutAttr
+		.start();
 }
 
 // Listen out for newData events coming from the server
@@ -345,7 +359,7 @@ exports.send = function() {
 $(document).ready(function() {
 	screenLoad();
 
-	$('radioButtons').change(function(){
+	$('#radioButtons').change(function(){
 		console.log("Changed val of radio button!");
 		exports.send();	
 		initChart();
